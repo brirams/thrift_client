@@ -96,6 +96,8 @@ class AbstractThriftClient
   # Force the client to connect to the server. Not necessary to be
   # called as the connection will be made on the first RPC method
   # call.
+  # @bramos: Whoever is calling this is retrying and ignoring the exception they get, resulting in
+  # next live servers getting thrown. that should get rationalized
   def connect!(method = nil)
     start_time ||= Time.now
     @current_server = next_live_server
@@ -152,6 +154,10 @@ class AbstractThriftClient
     result
   # Thrift exceptions get read off the wire. We can consider them complete requests
   rescue Thrift::Exception => e
+    puts "we're in ensure_socket_ailgnment"
+    puts caller
+    puts "we caught exception with message: #{e.message}"
+
     incomplete = false
     raise e
   ensure
